@@ -62,7 +62,20 @@ class SongClient(object):
         upload_response = api.upload(json_payload=payload, is_async_validation=False)
         logger.debug("upload response: {response}".format(response=upload_response))
         return upload_response
-    
+
+    def create_custom_analysis(
+        self,
+        study_id,
+        payload
+    ):
+        api = Api(
+            ApiConfig(self.base_url, study_id, self.token, debug=True)
+        )
+        logger.debug("Analysis creation payload: {payload}".format(payload=payload))
+        upload_response = api.upload(json_payload=payload, is_async_validation=False)
+        logger.debug("upload response: {response}".format(response=upload_response))
+        return upload_response
+
     def get_analysis_manifest(
         self,
         study_id,
