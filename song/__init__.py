@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class SongClient(object):
     schemas_url = '{base_url}/schemas'
+    studies_list_url = '{base_url}/studies/all'
 
     def __init__(self, base_url, token):
         self.base_url = base_url
@@ -27,15 +28,14 @@ class SongClient(object):
             ApiConfig(self.base_url, id, self.token, debug=True)
         )
         study_client = StudyClient(api)
-        if not study_client.has(id):
-            study_client.create(
-                Study.create(
-                    id,
-                    name,
-                    description,
-                    organization
-                )
+        study_client.create(
+            Study.create(
+                id,
+                name,
+                description,
+                organization
             )
+        )
 
     def create_analysis(
         self,
@@ -115,3 +115,14 @@ class SongClient(object):
         logger.debug('schema creation status code: {code}'.format(code=res.status_code))
         logger.debug('schema creation response: {response}'.format(response=res.content))
         assert res.status_code == 200
+    
+    def get_studies_list(self):
+        res = requests.get(
+            self.studies_list_url.format(base_url=self.base_url), 
+            verify=False,
+            headers={
+                'Authorization': 'Bearer {token}'.format(token=self.token)
+            }
+        )
+        assert res.status_code == 200
+        return res.json()
