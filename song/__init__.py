@@ -7,11 +7,13 @@ from song.original_song_cli.tools import SimplePayloadBuilder
 from song.original_song_cli.client import Api, StudyClient, ManifestClient
 from song.original_song_cli.model import ApiConfig
 
-logger = logging.getLogger(__name__)
+def _get_logger():
+    return logging.getLogger(__name__)
 
 class SongClient(object):
     schemas_url = '{base_url}/schemas'
     studies_list_url = '{base_url}/studies/all'
+    submit_url = '{base_url}/submit/{studyId}'
 
     def __init__(self, base_url, token):
         self.base_url = base_url
@@ -47,6 +49,7 @@ class SongClient(object):
         files,
         experiment
     ):
+        logger = _get_logger()
         api = Api(
             ApiConfig(self.base_url, study_id, self.token, debug=True)
         )
@@ -68,13 +71,21 @@ class SongClient(object):
         study_id,
         payload
     ):
-        api = Api(
-            ApiConfig(self.base_url, study_id, self.token, debug=True)
-        )
+        logger = _get_logger()
         logger.debug("Analysis creation payload: {payload}".format(payload=payload))
-        upload_response = api.upload(json_payload=payload, is_async_validation=False)
-        logger.debug("upload response: {response}".format(response=upload_response))
-        return upload_response
+        res = requests.post(
+            self.submit_url.format(base_url=self.base_url, studyId=study_id), 
+            data=payload,
+            verify=False,
+            headers={
+                'Authorization': 'Bearer {token}'.format(token=self.token),
+                'Content-Type': 'application/json'
+            }
+        )
+        logger.debug('upload status code: {code}'.format(code=res.status_code))
+        logger.debug('upload response: {response}'.format(response=res.content))
+        assert res.status_code == 200
+        return res.json()
 
     def get_analysis_manifest(
         self,
@@ -103,6 +114,8 @@ class SongClient(object):
         ).list_schemas()
     
     def create_schema(self, schema):
+        logger = _get_logger()
+        logger.debug("Schema creation payload: {payload}".format(payload=schema))
         res = requests.post(
             self.schemas_url.format(base_url=self.base_url), 
             data=schema,
