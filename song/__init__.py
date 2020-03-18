@@ -14,6 +14,7 @@ class SongClient(object):
     schemas_url = '{base_url}/schemas'
     studies_list_url = '{base_url}/studies/all'
     submit_url = '{base_url}/submit/{studyId}'
+    analyses_url = '{base_url}/studies/{studyId}/analysis?analysisStates={publication_status}'
 
     def __init__(self, base_url, token):
         self.base_url = base_url
@@ -130,6 +131,7 @@ class SongClient(object):
         assert res.status_code == 200
     
     def get_studies_list(self):
+        logger = _get_logger()
         res = requests.get(
             self.studies_list_url.format(base_url=self.base_url), 
             verify=False,
@@ -137,5 +139,28 @@ class SongClient(object):
                 'Authorization': 'Bearer {token}'.format(token=self.token)
             }
         )
+        logger.debug('Get studies list status code: {code}'.format(code=res.status_code))
         assert res.status_code == 200
         return res.json()
+
+    def get_analyses(
+        self,
+        study_id,
+        publication_status
+    ):
+        logger = _get_logger()
+        res = requests.get(
+            self.analyses_url.format(
+                base_url=self.base_url,
+                studyId=study_id,
+                publication_status=publication_status
+            ), 
+            verify=False,
+            headers={
+                'Authorization': 'Bearer {token}'.format(token=self.token)
+            }
+        )
+        logger.debug('Get analyses status code: {code}'.format(code=res.status_code))
+        assert res.status_code == 200
+        return res.json()
+
