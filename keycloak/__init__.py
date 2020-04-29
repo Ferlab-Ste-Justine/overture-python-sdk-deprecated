@@ -6,10 +6,17 @@ logger = logging.getLogger(__name__)
 class KeyCloakClient(object):
     login_url = '{base_url}/protocol/openid-connect/token'
 
-    def __init__(self, base_url, client_id, client_secret):
+    def __init__(
+        self, 
+        base_url, 
+        client_id, 
+        client_secret, 
+        verify_certificate=True
+    ):
         self.base_url = base_url
         self.client_id = client_id
-        self.client_secret = client_secret
+        self.client_secret = client_secret,
+        self.verify_certificate = verify_certificate
     
     def login(self, username, password):
         res = requests.post(
@@ -22,7 +29,7 @@ class KeyCloakClient(object):
                 'client_id': self.client_id,
                 'client_secret': self.client_secret
             },
-            verify=False
+            verify=self.verify_certificate
         )
         logger.debug('login status code: {code}'.format(code=res.status_code))
         logger.debug('login response: {response}'.format(response=res.content))

@@ -16,9 +16,10 @@ class SongClient(object):
     submit_url = '{base_url}/submit/{studyId}'
     analyses_url = '{base_url}/studies/{studyId}/analysis?analysisStates={publication_status}'
 
-    def __init__(self, base_url, token):
+    def __init__(self, base_url, token, verify_certificate=True):
         self.base_url = base_url
         self.token = token
+        self.verify_certificate = verify_certificate
 
     def create_study(
         self,
@@ -77,7 +78,7 @@ class SongClient(object):
         res = requests.post(
             self.submit_url.format(base_url=self.base_url, studyId=study_id), 
             data=payload,
-            verify=False,
+            verify=self.verify_certificate,
             headers={
                 'Authorization': 'Bearer {token}'.format(token=self.token),
                 'Content-Type': 'application/json'
@@ -120,7 +121,7 @@ class SongClient(object):
         res = requests.post(
             self.schemas_url.format(base_url=self.base_url), 
             data=schema,
-            verify=False,
+            verify=self.verify_certificate,
             headers={
                 'Authorization': 'Bearer {token}'.format(token=self.token),
                 'Content-Type': 'application/json'
@@ -134,7 +135,7 @@ class SongClient(object):
         logger = _get_logger()
         res = requests.get(
             self.studies_list_url.format(base_url=self.base_url), 
-            verify=False,
+            verify=self.verify_certificate,
             headers={
                 'Authorization': 'Bearer {token}'.format(token=self.token)
             }
@@ -155,7 +156,7 @@ class SongClient(object):
                 studyId=study_id,
                 publication_status=publication_status
             ), 
-            verify=False,
+            verify=self.verify_certificate,
             headers={
                 'Authorization': 'Bearer {token}'.format(token=self.token)
             }
