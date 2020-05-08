@@ -17,7 +17,7 @@ jobs:
     - name: Install Package
       run: python setup.py install
     - name: Install Pylint
-      run: pip install pylint@2.5.2 && pip install pylint --upgrade
+      run: pip install pylint==2.5.2
     - name: Run Pylint On Keycloak Package
       run: pylint keycloak
     - name: Run Pylint On SONG Package
