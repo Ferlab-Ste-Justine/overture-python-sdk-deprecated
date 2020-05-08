@@ -5,7 +5,8 @@ Package to abstract away Keycloak API calls
 import logging
 import requests
 
-logger = logging.getLogger(__name__)
+def _get_logger():
+    return logging.getLogger(__name__)
 
 # pylint: disable=R0903
 class KeyCloakClient:
@@ -50,6 +51,7 @@ class KeyCloakClient:
             },
             verify=self.verify_certificate
         )
+        logger = _get_logger()
         logger.debug('login status code: %s', res.status_code)
         logger.debug('login response: %s', res.content)
         assert res.status_code == 200
