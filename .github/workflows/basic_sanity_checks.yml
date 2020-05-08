@@ -1,0 +1,24 @@
+name: Basic Sanity Checks
+
+on: [push]
+
+jobs:
+  install:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Package
+      run: python setup.py install
+    - name: Install Pylint
+      run: pip install pylint@2.5.2 && pip install pylint --upgrade
+    - name: Run Pylint On Keycloak Package
+      run: pylint keycloak
+    - name: Run Pylint On SONG Package
+      run: pylint --ignore=original_song_cli song
